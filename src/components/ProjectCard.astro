@@ -1,0 +1,27 @@
+---
+import type { Lang } from '@/lib/i18n';
+import { assetPath, pathFor } from '@/lib/i18n';
+import type { Project } from '@/data/projects';
+import { text } from '@/data/projects';
+import EditorialCover from '@/components/EditorialCover.astro';
+
+interface Props { project: Project; lang: Lang; featured?: boolean; }
+const { project, lang, featured = false } = Astro.props;
+---
+<article class:list={['project-card', { 'project-card-featured': featured }]} data-category={project.category.join(' ')} data-reveal>
+  <a class="project-media" href={pathFor(lang, `projects/${project.id}/`)} aria-label={`${text(project.title, lang)} — ${text(project.subtitle, lang)}`}>
+    {featured && project.deep
+      ? <EditorialCover id={project.id as 'medicine' | 'jiguang' | 'beeye'} lang={lang} />
+      : <img src={assetPath(project.cover)} alt={text(project.subtitle, lang)} loading="lazy" decoding="async" />}
+    <span class="media-action">{lang === 'zh' ? '查看项目' : 'View project'} ↗</span>
+  </a>
+  <div class="project-card-copy">
+    <div class="project-meta"><span>{project.number}</span><span>{text(project.categoryLabel, lang)}</span></div>
+    <h3><a href={pathFor(lang, `projects/${project.id}/`)}>{text(project.title, lang)}</a></h3>
+    <p class="project-subtitle">{text(project.subtitle, lang)}</p>
+    {featured && <p class="project-summary">{text(project.summary, lang)}</p>}
+    <ul class="tag-list" aria-label={lang === 'zh' ? '项目关键词' : 'Project keywords'}>
+      {project.tags[lang].map((tag) => <li>{tag}</li>)}
+    </ul>
+  </div>
+</article>

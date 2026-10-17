@@ -1,0 +1,68 @@
+---
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import type { Lang } from '@/lib/i18n';
+import { assetPath, t } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  image?: string;
+  hideChrome?: boolean;
+}
+
+const { lang, title, description, image = 'assets/og-cover.webp', hideChrome = false } = Astro.props;
+const strings = t(lang);
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const alternatePath = Astro.url.pathname.replace(`/${lang}/`, `/${lang === 'zh' ? 'en' : 'zh'}/`);
+const alternate = new URL(alternatePath, Astro.site);
+---
+<!doctype html>
+<html lang={strings.locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={lang === 'zh' ? 'en' : 'zh-CN'} href={alternate} />
+    <link rel="icon" href={assetPath('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(assetPath(image), Astro.site)} />
+    <meta property="og:locale" content={strings.locale} />
+    <title>{title}</title>
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{lang === 'zh' ? '跳至主要内容' : 'Skip to content'}</a>
+    {!hideChrome && <Header lang={lang} />}
+    <main id="main"><slot /></main>
+    {!hideChrome && <Footer lang={lang} />}
+    <script is:inline>
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduced && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
+      } else {
+        document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  @import '@/styles/global.css';
+</style>

@@ -1,0 +1,78 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { languages, assetPath, t, type Lang } from '@/lib/i18n';
+import { profile, profileText } from '@/data/profile';
+
+export function getStaticPaths() { return languages.map((lang) => ({ params: { lang }, props: { lang } })); }
+const lang = Astro.props.lang as Lang;
+const strings = t(lang);
+const info = profileText(lang);
+---
+<BaseLayout lang={lang} title={`${strings.nav.about} · ${info.name}`} description={strings.about.intro} image="assets/profile.webp">
+  <section class="about-hero shell">
+    <div data-reveal>
+      <p class="section-index">02 / ABOUT</p>
+      <h1>{strings.about.title}</h1>
+      <p class="intro">{strings.about.intro}</p>
+    </div>
+    <figure data-reveal><img src={assetPath('assets/profile.webp')} alt={info.name} /></figure>
+  </section>
+
+  <section class="about-section shell">
+    <SectionHeading index="01" title={strings.about.education} />
+    <div class="education-row" data-reveal>
+      <span>2020 — {lang === 'zh' ? '至今' : 'Present'}</span>
+      <div><h3>{info.school}</h3><p>{info.degree}</p></div>
+    </div>
+  </section>
+
+  <section class="about-section principles-section">
+    <div class="shell">
+      <SectionHeading index="02" title={strings.about.principles} />
+      <ol class="principles-grid">
+        {info.principles.map(([title, body], index) => <li data-reveal><span>0{index + 1}</span><h3>{title}</h3><p>{body}</p></li>)}
+      </ol>
+    </div>
+  </section>
+
+  <section class="about-section shell">
+    <SectionHeading index="03" title={strings.about.awards} />
+    <ol class="awards-list">
+      {info.awards.map((award, index) => <li data-reveal><span>{String(index + 1).padStart(2, '0')}</span><p>{award}</p></li>)}
+    </ol>
+  </section>
+
+  <section class="about-section tools-section">
+    <div class="shell">
+      <SectionHeading index="04" title={strings.about.tools} />
+      <ul class="tool-list">{profile.tools.map((tool) => <li>{tool}</li>)}</ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-hero { display: grid; grid-template-columns: 1.35fr .65fr; gap: 80px; align-items: center; padding: 100px 0; }
+  .about-hero h1 { max-width: 10ch; }
+  .intro { max-width: 58ch; color: var(--muted); font-size: 1.12rem; }
+  .about-hero figure { margin: 0; overflow: hidden; background: var(--soft); border-radius: 10px; }
+  .about-hero img { width: 100%; aspect-ratio: 4/5; object-fit: cover; object-position: center top; filter: saturate(.88); }
+  .about-section { padding-block: 100px; }
+  .education-row { display: grid; grid-template-columns: .35fr 1fr; border-top: 1px solid var(--line); padding-top: 28px; }
+  .education-row > span { color: var(--blue); font-weight: 800; }
+  .education-row h3 { margin-bottom: 8px; }
+  .education-row p { color: var(--muted); }
+  .principles-section, .tools-section { background: var(--soft); }
+  .principles-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .principles-grid li { min-height: 240px; padding: 30px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .principles-grid span { color: var(--blue); font-weight: 800; }
+  .principles-grid h3 { margin: 54px 0 12px; }
+  .principles-grid p { color: var(--muted); max-width: 44ch; }
+  .awards-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .awards-list li { display: grid; grid-template-columns: 80px 1fr; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+  .awards-list span { color: var(--blue); font-weight: 800; }
+  .awards-list p { margin: 0; }
+  .tool-list { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; margin: 0; padding: 0; }
+  .tool-list li { background: white; border: 1px solid var(--line); padding: 12px 15px; border-radius: 6px; }
+  @media (max-width: 760px) { .about-hero { grid-template-columns: 1fr; padding: 72px 0; gap: 40px; } .about-hero figure { max-width: 420px; } .about-section { padding-block: 76px; } .education-row, .principles-grid { grid-template-columns: 1fr; } .education-row { gap: 22px; } }
+</style>

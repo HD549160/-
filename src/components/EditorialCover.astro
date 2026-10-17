@@ -1,0 +1,132 @@
+---
+import type { Lang } from '@/lib/i18n';
+import { assetPath } from '@/lib/i18n';
+
+interface Props {
+  id: 'medicine' | 'jiguang' | 'beeye';
+  lang: Lang;
+  compact?: boolean;
+}
+
+const { id, lang, compact = false } = Astro.props;
+
+const copy = {
+  medicine: {
+    number: '01 / 03',
+    eyebrow: lang === 'zh' ? '服务系统 · 软硬件协同' : 'SERVICE SYSTEM · PHYGITAL',
+    word: 'SAFE',
+    title: lang === 'zh' ? '药你安全' : 'Medicine Safe',
+    line: lang === 'zh' ? '让每一次用药，都更安心。' : 'Confidence in every dose.',
+    image: 'assets/medicine/hero.webp',
+    alt: lang === 'zh' ? '用药管理设备、平板端与家庭端应用' : 'Medication device, tablet and family mobile application'
+  },
+  jiguang: {
+    number: '02 / 03',
+    eyebrow: lang === 'zh' ? 'AI 应用 · 代际沟通' : 'AI PRODUCT · CONNECTION',
+    word: 'MEMORY',
+    title: lang === 'zh' ? '籍光' : 'Jiguang',
+    line: lang === 'zh' ? '让记忆被记录，也被共同看见。' : 'Stories remembered, shared and seen.',
+    image: 'assets/jiguang/interfaces.webp',
+    alt: lang === 'zh' ? '籍光应用界面与故事记录流程' : 'Jiguang interface and story-recording flow'
+  },
+  beeye: {
+    number: '03 / 03',
+    eyebrow: lang === 'zh' ? '智能硬件 · 骑行安全' : 'SMART HARDWARE · SAFETY',
+    word: 'BE EYE',
+    title: 'Beeye',
+    line: lang === 'zh' ? '把导航与提醒，放进骑手视野。' : 'Navigation and alerts within sight.',
+    image: 'assets/beeye/hero.webp',
+    alt: lang === 'zh' ? '外卖骑手智能头盔' : 'Smart helmet for delivery riders'
+  }
+} as const;
+
+const item = copy[id];
+---
+
+<div class:list={['editorial-cover', `editorial-cover--${id}`, { 'editorial-cover--compact': compact }]}>
+  <div class="cover-no">{item.number}</div>
+  <p class="cover-eyebrow">{item.eyebrow}</p>
+  <p class="cover-word" aria-hidden="true">{item.word}</p>
+  <div class="cover-art"><img src={assetPath(item.image)} alt={item.alt} decoding="async" /></div>
+  <div class="cover-caption">
+    <strong>{item.title}</strong>
+    <span>{item.line}</span>
+  </div>
+  <div class="cover-mark" aria-hidden="true"><i></i><i></i><i></i></div>
+</div>
+
+<style>
+  .editorial-cover {
+    --accent: #56ecff;
+    --accent-2: #7b70ff;
+    position: absolute;
+    inset: 0;
+    isolation: isolate;
+    overflow: hidden;
+    color: #fff;
+    background:
+      radial-gradient(circle at 82% 25%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 34%),
+      linear-gradient(122deg, #07111e 0%, #0b1527 54%, #111d31 100%);
+  }
+  .editorial-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(4,10,18,.98) 0%, rgba(4,10,18,.88) 28%, rgba(4,10,18,.15) 61%, rgba(4,10,18,.22) 100%),
+      linear-gradient(0deg, rgba(4,10,18,.78) 0%, transparent 36%);
+  }
+  .editorial-cover::after {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    z-index: 4;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,.14);
+  }
+  .cover-art { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+  .cover-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(125deg, transparent 46%, rgba(255,255,255,.08) 70%, transparent 71%); mix-blend-mode: screen; }
+  .cover-art img { max-width: none; filter: saturate(1.08) contrast(1.03); }
+  .cover-no, .cover-eyebrow, .cover-word, .cover-caption, .cover-mark { position: absolute; z-index: 3; }
+  .cover-no { top: 28px; right: 30px; color: var(--accent); font-size: .68rem; font-weight: 800; letter-spacing: .16em; }
+  .cover-eyebrow { top: 27px; left: 30px; margin: 0; color: rgba(255,255,255,.74); font-size: .62rem; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+  .cover-word { left: 27px; top: 20%; margin: 0; color: var(--accent); font-size: clamp(3.25rem, 8vw, 7.7rem); font-weight: 850; letter-spacing: -.075em; line-height: .78; text-transform: uppercase; text-shadow: 0 10px 45px color-mix(in srgb, var(--accent) 22%, transparent); }
+  .cover-caption { left: 31px; bottom: 29px; display: grid; gap: 3px; }
+  .cover-caption strong { font-size: clamp(1.05rem, 2vw, 1.7rem); letter-spacing: -.03em; }
+  .cover-caption span { color: rgba(255,255,255,.68); font-size: .67rem; letter-spacing: .05em; }
+  .cover-mark { right: 31px; bottom: 31px; display: flex; gap: 5px; }
+  .cover-mark i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.34); }
+  .cover-mark i:first-child { width: 21px; border-radius: 9px; background: var(--accent); }
+
+  .editorial-cover--medicine .cover-art img { position: absolute; width: 115%; height: 123%; right: -15%; top: -5%; object-fit: cover; object-position: 68% 24%; }
+
+  .editorial-cover--jiguang { --accent: #ffcf4a; --accent-2: #ff815a; background: linear-gradient(125deg, #17101a 0%, #221428 52%, #3b183b 100%); }
+  .editorial-cover--jiguang::before { background: linear-gradient(90deg, rgba(18,9,19,.99) 0%, rgba(18,9,19,.91) 34%, rgba(18,9,19,.16) 66%, rgba(18,9,19,.3) 100%), linear-gradient(0deg, rgba(18,9,19,.82), transparent 45%); }
+  .editorial-cover--jiguang .cover-art { left: 32%; }
+  .editorial-cover--jiguang .cover-art img { position: absolute; width: 154%; height: 128%; left: -23%; top: -13%; object-fit: cover; object-position: 78% 55%; transform: rotate(-1.5deg); }
+  .editorial-cover--jiguang .cover-word { font-size: clamp(2.7rem, 6.8vw, 6.5rem); }
+
+  .editorial-cover--beeye { --accent: #ecff25; --accent-2: #ffba24; background: linear-gradient(120deg, #06090d 0%, #0b0f13 54%, #18180a 100%); }
+  .editorial-cover--beeye::before { background: linear-gradient(90deg, rgba(4,6,8,.99) 0%, rgba(4,6,8,.88) 34%, rgba(4,6,8,.12) 67%, rgba(4,6,8,.34) 100%), linear-gradient(0deg, rgba(4,6,8,.8), transparent 42%); }
+  .editorial-cover--beeye .cover-art { left: 34%; }
+  .editorial-cover--beeye .cover-art img { position: absolute; width: 125%; height: 205%; left: -8%; top: -51%; object-fit: cover; object-position: 66% 50%; filter: saturate(1.2) contrast(1.08); }
+
+  .editorial-cover--compact .cover-eyebrow,
+  .editorial-cover--compact .cover-caption span,
+  .editorial-cover--compact .cover-mark { display: none; }
+  .editorial-cover--compact .cover-no { top: 13px; right: 14px; font-size: .52rem; }
+  .editorial-cover--compact .cover-word { left: 12px; top: 25%; font-size: clamp(1.8rem, 3.8vw, 3rem); }
+  .editorial-cover--compact .cover-caption { left: 14px; bottom: 13px; }
+  .editorial-cover--compact .cover-caption strong { font-size: .85rem; }
+
+  @media (max-width: 680px) {
+    .cover-no { top: 20px; right: 21px; }
+    .cover-eyebrow { top: 19px; left: 21px; max-width: 62%; }
+    .cover-word { left: 19px; top: 24%; font-size: clamp(2.6rem, 15vw, 4.8rem); }
+    .cover-caption { left: 21px; bottom: 21px; }
+    .cover-mark { right: 21px; bottom: 23px; }
+    .editorial-cover--jiguang .cover-word { font-size: clamp(2.25rem, 12vw, 4rem); }
+  }
+</style>

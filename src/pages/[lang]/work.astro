@@ -1,0 +1,68 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { projects } from '@/data/projects';
+import { languages, t, type Lang } from '@/lib/i18n';
+
+export function getStaticPaths() { return languages.map((lang) => ({ params: { lang }, props: { lang } })); }
+const lang = Astro.props.lang as Lang;
+const strings = t(lang);
+const filters = [
+  ['all', strings.work.all], ['deep', strings.work.deep], ['product', strings.work.product],
+  ['interaction', strings.work.interaction], ['service', strings.work.service],
+  ['culture', strings.work.culture], ['sketch', strings.work.sketch]
+];
+---
+<BaseLayout lang={lang} title={`${strings.work.title} · ${lang === 'zh' ? '黄丹' : 'Huang Dan'}`} description={strings.work.intro}>
+  <header class="page-hero shell" data-reveal>
+    <p class="section-index">01 / WORK</p>
+    <h1>{strings.work.title}</h1>
+    <p>{strings.work.intro}</p>
+  </header>
+  <section class="work-section shell">
+    <div class="filters" role="group" aria-label={lang === 'zh' ? '作品分类筛选' : 'Project category filters'}>
+      {filters.map(([id, label], index) => <button class:list={{ active: index === 0 }} type="button" data-filter={id} aria-pressed={index === 0}>{label}<span>{id === 'all' ? projects.length : projects.filter((p) => p.category.includes(id as never)).length}</span></button>)}
+    </div>
+    <div class="work-grid" aria-live="polite">
+      {projects.map((project) => <ProjectCard project={project} lang={lang} />)}
+    </div>
+    <p class="empty-state" hidden>{lang === 'zh' ? '该分类暂无作品。' : 'No projects in this category.'}</p>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  const buttons = [...document.querySelectorAll('[data-filter]')];
+  const cards = [...document.querySelectorAll('[data-category]')];
+  const empty = document.querySelector('.empty-state');
+  buttons.forEach((button) => button.addEventListener('click', () => {
+    const filter = button.dataset.filter;
+    buttons.forEach((item) => {
+      const active = item === button;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+    let visible = 0;
+    cards.forEach((card) => {
+      const show = filter === 'all' || card.dataset.category.split(' ').includes(filter);
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+    if (empty) empty.hidden = visible !== 0;
+  }));
+</script>
+
+<style>
+  .page-hero { padding: 110px 0 74px; border-bottom: 1px solid var(--line); }
+  .page-hero h1 { margin: 0 0 28px; }
+  .page-hero > p:last-child { max-width: 62ch; color: var(--muted); font-size: 1.12rem; }
+  .work-section { padding: 44px 0 120px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 52px; }
+  .filters button { border: 1px solid var(--line); border-radius: 999px; background: white; padding: 9px 13px; color: var(--muted); cursor: pointer; }
+  .filters button span { margin-left: 8px; color: #8a95a4; font-size: .72rem; }
+  .filters button.active { background: var(--ink); color: white; border-color: var(--ink); }
+  .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 58px 22px; }
+  .work-grid :global(.project-card[hidden]) { display: none; }
+  .empty-state { padding: 80px 0; text-align: center; color: var(--muted); }
+  @media (max-width: 900px) { .work-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .page-hero { padding: 76px 0 52px; } .work-grid { grid-template-columns: 1fr; } .filters { gap: 6px; } .filters button { padding: 8px 10px; font-size: .82rem; } }
+</style>

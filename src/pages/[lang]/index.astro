@@ -1,0 +1,152 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { featuredProjects, archiveProjects, text } from '@/data/projects';
+import { languages, pathFor, t, type Lang } from '@/lib/i18n';
+import { profile } from '@/data/profile';
+import EditorialCover from '@/components/EditorialCover.astro';
+
+export function getStaticPaths() { return languages.map((lang) => ({ params: { lang }, props: { lang } })); }
+const lang = Astro.props.lang as Lang;
+const strings = t(lang);
+const capabilities = lang === 'zh'
+  ? [
+      ['01', '工业设计', '从形态、结构、人机关系与使用场景理解实体产品。'],
+      ['02', '交互设计', '组织信息与任务路径，让功能更容易理解和使用。'],
+      ['03', '服务设计', '连接不同角色与触点，梳理连续的服务体验。'],
+      ['04', '信息组织', '把复杂研究与流程转化为可讨论的产品结构。']
+    ]
+  : [
+      ['01', 'Industrial design', 'Understand physical products through form, structure, ergonomics and context.'],
+      ['02', 'Interaction design', 'Organise information and task flows so functions are easier to understand and use.'],
+      ['03', 'Service design', 'Connect roles and touchpoints into a continuous service experience.'],
+      ['04', 'Information structure', 'Turn complex research and processes into discussable product structures.']
+    ];
+const methods = lang === 'zh'
+  ? [['01', '发现问题', '观察具体的人、任务与使用情境。'], ['02', '定义机会', '区分事实、痛点、假设与设计边界。'], ['03', '规划方案', '建立功能优先级、体验流程与产品结构。'], ['04', '验证迭代', '明确验证目标、反馈方式和下一步行动。']]
+  : [['01', 'Discover', 'Observe real people, tasks and contexts.'], ['02', 'Define', 'Separate facts, pain points, assumptions and boundaries.'], ['03', 'Plan', 'Shape priorities, experience flows and product structure.'], ['04', 'Validate', 'Define learning goals, feedback methods and next actions.']];
+---
+<BaseLayout lang={lang} title={`${profile.name[lang]} · ${strings.hero.eyebrow}`} description={strings.hero.body}>
+  <section class="hero shell">
+    <div class="hero-copy" data-reveal>
+      <p class="eyebrow"><span></span>{strings.hero.eyebrow}</p>
+      <h1>{strings.hero.title.split('\n').map((line) => <span>{line}</span>)}</h1>
+      <p class="hero-body">{strings.hero.body}</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#featured">{strings.hero.primary}</a>
+        <a class="button button-secondary" href={pathFor(lang, 'resume/')}>{strings.hero.secondary}</a>
+      </div>
+      <p class="availability"><i aria-hidden="true"></i>{strings.hero.availability}</p>
+    </div>
+    <div class="hero-visual" data-reveal>
+      <a class="hero-main" href={pathFor(lang, 'projects/medicine/')}>
+        <EditorialCover id="medicine" lang={lang} />
+      </a>
+      <a class="hero-thumb hero-thumb-a" href={pathFor(lang, 'projects/jiguang/')} aria-label={text(featuredProjects[1].title, lang)}><EditorialCover id="jiguang" lang={lang} compact={true} /></a>
+      <a class="hero-thumb hero-thumb-b" href={pathFor(lang, 'projects/beeye/')} aria-label={text(featuredProjects[2].title, lang)}><EditorialCover id="beeye" lang={lang} compact={true} /></a>
+    </div>
+  </section>
+
+  <div class="signal-strip"><div class="shell"><span>{lang === 'zh' ? '产品思考' : 'Product thinking'}</span><span>{lang === 'zh' ? '用户体验' : 'User experience'}</span><span>{lang === 'zh' ? '工业设计' : 'Industrial design'}</span><span>{lang === 'zh' ? '清晰表达' : 'Clear communication'}</span></div></div>
+
+  <section id="featured" class="section shell">
+    <SectionHeading index="01 / SELECTED WORK" title={strings.sections.featured} note={strings.sections.featuredNote} />
+    <div class="featured-grid">
+      {featuredProjects.map((project) => <ProjectCard project={project} lang={lang} featured={true} />)}
+    </div>
+  </section>
+
+  <section id="method" class="section method-section">
+    <div class="shell">
+      <SectionHeading index="02 / METHOD" title={strings.sections.method} note={strings.sections.methodNote} />
+      <ol class="method-grid">
+        {methods.map(([number, title, body]) => <li data-reveal><span>{number}</span><h3>{title}</h3><p>{body}</p></li>)}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section shell">
+    <SectionHeading index="03 / CAPABILITIES" title={strings.sections.capabilities} note={strings.sections.capabilitiesNote} />
+    <div class="capability-grid">
+      {capabilities.map(([number, title, body]) => <article data-reveal><span>{number}</span><h3>{title}</h3><p>{body}</p></article>)}
+    </div>
+  </section>
+
+  <section class="section archive-section">
+    <div class="shell">
+      <SectionHeading index="04 / ARCHIVE" title={strings.sections.archive} note={strings.sections.archiveNote} />
+      <div class="archive-grid">
+        {archiveProjects.slice(0, 6).map((project) => <ProjectCard project={project} lang={lang} />)}
+      </div>
+      <p class="section-cta"><a class="button button-secondary" href={pathFor(lang, 'work/')}>{strings.actions.viewAll} →</a></p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero { min-height: calc(100vh - 76px); display: grid; grid-template-columns: .88fr 1.12fr; gap: clamp(48px, 7vw, 96px); align-items: center; padding-block: 72px; }
+  .eyebrow { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .76rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .eyebrow span { width: 28px; height: 2px; background: var(--blue); }
+  .hero h1 { margin: 28px 0; }
+  .hero h1 span { display: block; }
+  .hero h1 span:last-child { color: var(--blue); }
+  .hero-body { max-width: 48ch; color: var(--muted); font-size: 1.08rem; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 34px 0 28px; }
+  .availability { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: .82rem; }
+  .availability i { width: 8px; height: 8px; border-radius: 50%; background: #1ea672; box-shadow: 0 0 0 5px rgba(30,166,114,.12); }
+  .hero-visual { position: relative; min-height: 610px; }
+  .hero-main { position: absolute; inset: 0 46px 72px 0; overflow: hidden; border-radius: 12px; background: #ddecff; }
+  .hero-thumb { position: absolute; width: 180px; aspect-ratio: 4/3; overflow: hidden; border: 7px solid white; border-radius: 9px; box-shadow: 0 16px 35px rgba(16,27,43,.16); }
+  .hero-thumb-a { right: 0; top: 58px; }
+  .hero-thumb-b { right: 8px; bottom: 0; }
+  .signal-strip { border-block: 1px solid var(--line); }
+  .signal-strip .shell { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: var(--muted); font-size: .78rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+  .signal-strip span + span::before { content: '↗'; color: var(--blue); margin-right: clamp(20px, 5vw, 70px); }
+  .section { padding-block: 120px; }
+  .featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px 28px; }
+  .featured-grid :global(.project-card:first-child) { grid-column: 1 / -1; display: grid; grid-template-columns: 1.35fr .65fr; gap: 38px; align-items: center; padding-bottom: 60px; border-bottom: 1px solid var(--line); }
+  .featured-grid :global(.project-card:first-child .project-card-copy) { padding: 0; }
+  .method-section { background: var(--ink); color: white; }
+  .method-section :global(.section-heading) { border-color: rgba(255,255,255,.2); }
+  .method-section :global(.section-note) { color: #aebacd; }
+  .method-grid { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; padding: 0; border-top: 1px solid rgba(255,255,255,.18); }
+  .method-grid li { min-height: 260px; padding: 28px 24px; border-right: 1px solid rgba(255,255,255,.18); }
+  .method-grid li:last-child { border-right: 0; }
+  .method-grid span { color: #72a3ff; font-weight: 800; }
+  .method-grid h3 { margin: 64px 0 14px; font-size: 1.35rem; }
+  .method-grid p { color: #aebacd; font-size: .92rem; }
+  .capability-grid { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .capability-grid article { padding: 32px; min-height: 230px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .capability-grid span { color: var(--blue); font-size: .78rem; font-weight: 800; }
+  .capability-grid h3 { margin: 56px 0 12px; }
+  .capability-grid p { color: var(--muted); max-width: 43ch; }
+  .archive-section { background: var(--soft); }
+  .archive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px 22px; }
+  .section-cta { margin: 54px 0 0; text-align: center; }
+  @media (max-width: 980px) {
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-visual { min-height: 560px; }
+    .archive-grid { grid-template-columns: repeat(2, 1fr); }
+    .method-grid { grid-template-columns: repeat(2, 1fr); }
+    .method-grid li:nth-child(2) { border-right: 0; }
+    .method-grid li { border-bottom: 1px solid rgba(255,255,255,.18); }
+  }
+  @media (max-width: 680px) {
+    .hero { padding-block: 52px 44px; gap: 36px; }
+    .hero-visual { min-height: 410px; }
+    .hero-main { inset: 0 20px 46px 0; }
+    .hero-main > span { left: 12px; right: 12px; bottom: 12px; padding: 10px 12px; }
+    .hero-thumb { width: 120px; border-width: 4px; }
+    .hero-thumb-a { top: 34px; }
+    .signal-strip .shell { flex-wrap: wrap; justify-content: flex-start; padding-block: 20px; }
+    .signal-strip span + span::before { margin-right: 14px; }
+    .section { padding-block: 82px; }
+    .featured-grid, .archive-grid, .capability-grid { grid-template-columns: 1fr; }
+    .featured-grid :global(.project-card:first-child) { grid-column: auto; display: block; padding-bottom: 48px; }
+    .featured-grid :global(.project-card:first-child .project-card-copy) { padding-top: 20px; }
+    .method-grid { grid-template-columns: 1fr; }
+    .method-grid li { border-right: 0; min-height: 210px; }
+    .method-grid h3, .capability-grid h3 { margin-top: 38px; }
+  }
+</style>
